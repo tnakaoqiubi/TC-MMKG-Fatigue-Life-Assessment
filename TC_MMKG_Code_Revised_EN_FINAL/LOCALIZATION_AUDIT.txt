@@ -1,0 +1,7 @@
+语言版本：English
+基线：TC_MMKG_Code_Revised_CN_STRICT_ORIGINAL_ANALOGY_ASSISTANT
+严格回滚核心文件保持原始版本：是
+核对文件：analogical_reasoner.py, case_library.py, causal_validator.py, causal_rules.py, qa_1.py
+API 路由：与基线一致（/, text_extract, image_extract, fusion, kg_import, rainflow, damage, download, kg_query, kg_nl_query, crossmodal_reason, full_pipeline）
+自动检查：Python compileall 通过；核心单元测试 3/3 通过；前端内联 JavaScript 语法检查通过。
+说明：本地化只针对用户可见文字、提示、报告/图表和导出标题；内部 JSON 键、Neo4j 语义关系、CSV/Excel 关键字段、API/函数接口保持兼容。

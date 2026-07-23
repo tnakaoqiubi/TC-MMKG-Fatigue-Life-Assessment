@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Truck-Crane Boom Remaining Fatigue Life Assessment System</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <style>
+        /* 样式保持不变 */
+        * { box-sizing: border-box; }
+        html { font-size: 24px; }
+        @media (max-width:1100px) { html { font-size: 22px; } }
+        @media (max-width:860px) { html { font-size: 20px; } }
+        @media (max-width:640px) { html { font-size: 18px; } }
+        @media (max-width:480px) { html { font-size: 16px; } }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Noto Sans', system-ui, sans-serif;
+            background: #eef2f5;
+            margin: 0;
+            padding: 16px 18px;
+            color: #1e2f3c;
+            line-height: 1.5;
+            font-size: 1rem;
+        }
+        .container { max-width: 1800px; margin: 0 auto; }
+
+        .header { text-align: center; margin-bottom: 20px; }
+        h1 {
+            font-size: 1.5rem;
+            margin: 0 0 6px 0;
+            color: #0a3a5e;
+            font-weight: 700;
+        }
+        .subtitle {
+            color: #2c5a7a;
+            font-size: 1rem;
+            font-weight: 500;
+            background: #e2ecf5;
+            display: inline-block;
+            padding: 4px 24px;
+            border-radius: 40px;
+        }
+
+        .three-columns { display: flex; gap: 20px; align-items: stretch; }
+        .col { display: flex; flex-direction: column; gap: 20px; }
+        .col-left { flex: 0 0 33%; }
+        .col-middle { flex: 0 0 34%; display: flex; flex-direction: column; gap: 20px; }
+        .col-right { flex: 0 0 33%; }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            height: 540px;
+            min-height: 540px;
+            max-height: 540px;
+            padding: 18px 20px 16px 20px;
+        }
+        .col-left .card:first-child { height: 440px; min-height: 440px; max-height: 440px; }
+        .col-left .card:last-child { height: 640px; min-height: 640px; max-height: 640px; }
+
+        .card h2 {
+            flex-shrink: 0;
+            margin: 0 0 12px 0;
+            font-size: 1rem;
+            border-left: 6px solid #2c7cb6;
+            padding: 0 0 0 14px;
+            color: #144d6e;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .card-scroll {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding-right: 2px;
+            scrollbar-width: thin;
+            scrollbar-color: #b0c8db #eef4f9;
+        }
+        .card-scroll::-webkit-scrollbar { width: 5px; }
+        .card-scroll::-webkit-scrollbar-track { background: #eef4f9; border-radius: 10px; }
+        .card-scroll::-webkit-scrollbar-thumb { background: #b0c8db; border-radius: 10px; }
+        .card-scroll::-webkit-scrollbar-thumb:hover { background: #8aaec9; }
+
+        .card-chat { height: 720px; min-height: 720px; max-height: 720px; margin-top: auto; }
+        .card-chat .chat-scroll-area {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-right: 2px;
+            scrollbar-width: thin;
+            scrollbar-color: #b0c8db #eef4f9;
+        }
+        .card-chat .chat-scroll-area::-webkit-scrollbar { width: 5px; }
+        .card-chat .chat-scroll-area::-webkit-scrollbar-track { background: #eef4f9; border-radius: 10px; }
+        .card-chat .chat-scroll-area::-webkit-scrollbar-thumb { background: #b0c8db; border-radius: 10px; }
+        .card-chat .chat-scroll-area::-webkit-scrollbar-thumb:hover { background: #8aaec9; }
+        .card-chat .chat-input-row { flex-shrink: 0; margin-top: 10px; }
+
+        .image-top-container {
+            flex-shrink: 0;
+            height: 360px;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 20px;
+            padding: 18px 20px 16px 20px;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+        }
+        .image-top-container .img-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f4f9ff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e0ecf5;
+            min-height: 130px;
+        }
+        .image-top-container .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        #chat-messages { display: flex; flex-direction: column; gap: 8px; padding: 4px 0; }
+        .message {
+            max-width: 85%;
+            padding: 8px 14px;
+            border-radius: 18px;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            word-break: break-word;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .message.user { align-self: flex-start; background: #e1f0fa; color: #08526e; border-bottom-left-radius: 4px; }
+        .message.assistant { align-self: flex-end; background: #daf1e2; color: #0a4c2a; border-bottom-right-radius: 4px; }
+        .message.error { align-self: flex-end; background: #ffe6e8; color: #a11f2f; }
+        .message.warning { align-self: flex-end; background: #fff0cf; color: #86641a; }
+
+        .mode-hint {
+            background: #eef3f8;
+            padding: 10px 14px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            color: #1a4d6b;
+            line-height: 1.5;
+            border-left: 5px solid #3080b0;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .upload-area {
+            background-color: #2c7cb6;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 8px 14px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-bottom: 8px;
+            width: 100%;
+            display: block;
+            letter-spacing: 0.3px;
+        }
+        .upload-area:hover { background-color: #1e5e8c; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input[type="file"] { display: none; }
+
+        button {
+            background-color: #2c7cb6;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.2s;
+            margin-top: 4px;
+            width: 100%;
+            letter-spacing: 0.3px;
+        }
+        button:hover { background-color: #1e5e8c; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        button.secondary { background-color: #4f6f8a; }
+        button.secondary:hover { background-color: #355973; }
+        button.small { padding: 5px 10px; font-size: 0.8rem; }
+        button.chat-send { width: auto; padding: 8px 18px; margin-top: 0; flex-shrink: 0; height: 40px; }
+
+        .status {
+            margin-top: 6px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        .status.success { background: #daf1e2; color: #0a4c2a; border-left: 5px solid #2b8c4a; }
+        .status.error { background: #ffe6e8; color: #a11f2f; border-left: 5px solid #d9534f; }
+        .status.info { background: #e1f0fa; color: #08526e; border-left: 5px solid #3aa3d4; }
+        .status.warning { background: #fff0cf; color: #86641a; border-left: 5px solid #f0ad4e; }
+
+        .status.consistency-pass { background: #d4edda; color: #155724; border-left: 5px solid #28a745; }
+        .status.consistency-fail { background: #f8d7da; color: #721c24; border-left: 5px solid #dc3545; }
+
+        input[type="text"], textarea, select {
+            font-size: 0.92rem;
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1.5px solid #cbdde9;
+            transition: 0.2s;
+            width: 100%;
+            font-family: inherit;
+            background: #ffffff;
+        }
+        input[type="text"]:focus, textarea:focus, select:focus {
+            border-color: #2c7cb6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(44,124,182,0.25);
+        }
+
+        #reason-input { resize: none; height: 60px; min-height: 60px; max-height: 60px; }
+        #reason-modal { height: 40px; padding: 6px 12px; font-size: 0.9rem; border-radius: 14px; border: 1.5px solid #cbdde9; background: #ffffff; width: 100%; font-family: inherit; }
+        textarea { resize: none; min-height: 50px; }
+
+        .result-img { max-width: 100%; margin-top: 10px; border-radius: 16px; border: 1px solid #cfdfed; }
+
+        #nl-vis-network { height: 220px; border: 1px solid #caddf0; border-radius: 16px; background: #ffffff; margin-top: 8px; width: 100%; }
+        #nl-cypher-display { font-size: 0.8rem; color: #2c648a; margin-top: 6px; background: #eef4fa; padding: 8px 12px; border-radius: 12px; font-family: monospace; word-break: break-word; }
+
+        .flex-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .flex-col { flex: 1; min-width: 100px; display: flex; flex-direction: column; }
+
+        .chat-input-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .chat-input-group { flex: 1; display: flex; gap: 8px; align-items: center; min-width: 180px; }
+        .chat-input-group input[type="text"] {
+            flex: 1;
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            border-radius: 14px;
+            border: 1.5px solid #cbdde9;
+            transition: 0.2s;
+            font-family: inherit;
+            background: #ffffff;
+            height: 40px;
+            min-height: 40px;
+            max-height: 40px;
+        }
+        .chat-input-group input[type="text"]:focus { border-color: #2c7cb6; outline: none; box-shadow: 0 0 0 3px rgba(44,124,182,0.25); }
+        .chat-input-group button { width: auto; padding: 8px 16px; margin-top: 0; white-space: nowrap; height: 40px; }
+
+        #damage-result { margin-top: 8px; }
+
+        footer {
+            text-align: center;
+            margin-top: 28px;
+            color: #5b7990;
+            font-size: 0.85rem;
+            padding: 12px 0;
+            border-top: 1.5px solid #cbdbe0;
+        }
+
+        @media (max-width:860px) {
+            .three-columns { flex-direction: column; }
+            .col-left, .col-middle, .col-right { flex: 1 1 auto; width: 100%; }
+            .col-left .card:first-child,
+            .col-left .card:last-child { height: 480px; min-height: 480px; max-height: 480px; }
+            .card { height: 480px; min-height: 480px; max-height: 480px; }
+            .card-chat { height: 480px; min-height: 480px; max-height: 480px; }
+            #nl-vis-network { height: 180px; }
+            .chat-input-row { flex-direction: column; }
+            .chat-input-group { width: 100%; }
+            .image-top-container { height: 260px; }
+        }
+        @media (max-width:480px) {
+            .card { padding: 14px 14px 12px 14px; height: 440px; min-height: 440px; max-height: 440px; }
+            .col-left .card:first-child,
+            .col-left .card:last-child { height: 440px; min-height: 440px; max-height: 440px; }
+            .card-chat { height: 440px; min-height: 440px; max-height: 440px; }
+            button { padding: 8px 10px; }
+            .upload-area { padding: 8px 10px; font-size: 0.85rem; }
+            #nl-vis-network { height: 150px; }
+            .chat-input-group input[type="text"] { height: 36px; min-height: 36px; max-height: 36px; }
+            .chat-input-group button { height: 36px; padding: 6px 12px; font-size: 0.8rem; }
+            #reason-input { height: 48px; min-height: 48px; max-height: 48px; }
+            .image-top-container { height: 220px; }
+        }
+        @media (max-width:400px) {
+            .card { height: 400px; min-height: 400px; max-height: 400px; }
+            .col-left .card:first-child,
+            .col-left .card:last-child { height: 400px; min-height: 400px; max-height: 400px; }
+            .card-chat { height: 400px; min-height: 400px; max-height: 400px; }
+        }
+    </style>
+    <script type="text/javascript" src="https://unpkg.com/vis-network@9.1.2/dist/vis-network.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚛 Truck-Crane Boom Remaining Fatigue Life Assessment System</h1>
+            <div class="subtitle">Multimodal Knowledge + Multi-Agent Collaboration | Reliable Remaining-Life Assessment</div>
+        </div>
+
+        <div class="three-columns">
+
+            <!-- ========== Left Column ========== -->
+            <div class="col col-left">
+                <div class="card">
+                    <h2>📂 Data Import</h2>
+                    <div class="card-scroll">
+                        <div class="mode-hint" style="font-size:0.82rem;">
+                            💡 <strong>Full mode</strong>: upload raw Excel + stress contour images<br>
+                            ✨ <strong>Quick mode</strong>: upload an existing fused-triple CSV
+                        </div>
+                        <label class="upload-area" id="excel-area">
+                            📊 Raw Operational Data
+                            <input type="file" id="excel-file" accept=".xlsx,.xls">
+                        </label>
+                        <div id="excel-status" class="status"></div>
+
+                        <label class="upload-area" id="images-area">
+                            🖼️ Stress Contour Images
+                            <input type="file" id="image-files" accept="image/png,image/jpeg,image/jpg" multiple>
+                        </label>
+                        <div id="images-status" class="status"></div>
+
+                        <div id="consistency-status" class="status" style="margin-top:8px; display:none;"></div>
+
+                        <label class="upload-area" id="fused-area">
+                            📁 Fused Triples (CSV)
+                            <input type="file" id="fused-file" accept=".csv">
+                        </label>
+                        <div id="fused-status" class="status"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🔍 1. Multimodal Knowledge Extraction and Fusion</h2>
+                    <div class="card-scroll">
+                        <button id="btn-text-extract">📄 Extract Text Triples</button>
+                        <div id="text-status" class="status"></div>
+                        <button id="btn-image-extract">🖼️ Extract Image Triples</button>
+                        <div id="image-status" class="status"></div>
+                        <button id="btn-fusion" class="secondary">🔄 Cross-Modal Fusion</button>
+                        <div id="fusion-status" class="status"></div>
+                        <button id="btn-kg-import">📤 Import into Neo4j</button>
+                        <div id="kg-status" class="status"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== Middle Column ========== -->
+            <div class="col col-middle">
+                <div class="image-top-container">
+                    <div class="img-box">
+                        <img src="../static/61.png" alt="Truck crane">
+                    </div>
+                </div>
+
+                <div class="card card-chat">
+                    <h2>⚙️ 2. Load Analysis and Life Prediction</h2>
+                    <div class="chat-scroll-area">
+                        <button id="btn-rainflow">🌧️ Rainflow Counting</button>
+                        <div id="rainflow-status" class="status"></div>
+                        <button id="btn-damage">📉 Damage Calculation and Remaining Life</button>
+                        <div id="damage-status" class="status"></div>
+                        <div id="damage-result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== Right Column ========== -->
+            <div class="col col-right">
+                <!-- Smart Assistant -->
+                <div class="card">
+                    <h2 style="display:flex; justify-content:space-between; align-items:center;">
+                        💬 Smart Assistant
+                        <button id="export-chat-btn" style="font-size:0.7rem; padding:2px 10px; width:auto; background:#4f6f8a; border-radius:12px; border:none; color:white; cursor:pointer; margin-top:0;">📥 Export Chat</button>
+                    </h2>
+                    <div class="card-scroll">
+                        <div id="chat-messages"></div>
+                        <div id="nl-vis-container" style="margin-top:12px; display:none;">
+                            <div id="nl-vis-network"></div>
+                            <div id="nl-cypher-display"></div>
+                        </div>
+                    </div>
+                    <div class="chat-input-row">
+                        <div class="chat-input-group">
+                            <input type="text" id="kg-question" placeholder="Ask the knowledge graph...">
+                            <button class="chat-send" id="btn-query">📢 Ask</button>
+                        </div>
+                        <div class="chat-input-group">
+                            <input type="text" id="nl-question" placeholder="Graph visualization query...">
+                            <button class="chat-send" id="btn-nl-visualize">✨ Visualize</button>
+                        </div>
+                    </div>
+                    <div id="kg-answer" style="display:none;"></div>
+                    <div id="nl-vis-status" style="display:none;"></div>
+                </div>
+
+                <!-- Analogical Reasoning -->
+                <div class="card">
+                    <h2 style="display:flex; justify-content:space-between; align-items:center;">
+                        🧠 3. Cross-Modal Analogical Reasoning and Causal Validation
+                        <button id="export-reason-btn" style="font-size:0.7rem; padding:2px 10px; width:auto; background:#4f6f8a; border-radius:12px; border:none; color:white; cursor:pointer; margin-top:0;">📥 Export Reasoning</button>
+                    </h2>
+                    <div class="card-scroll">
+                        <div class="mode-hint" style="font-size:0.82rem;">
+                            💡 Enter any modality (text / stress / life) to retrieve similar cases, generate missing modalities, and perform causal validation.
+                        </div>
+                        <div class="flex-row">
+                            <div class="flex-col" style="flex:1;">
+                                <select id="reason-modal" style="width:100%;height:40px;min-height:40px;max-height:40px;padding:6px 10px;">
+                                    <option value="text">Text (operating condition)</option>
+                                    <option value="stress">Stress description</option>
+                                    <option value="life">Damage / life</option>
+                                </select>
+                            </div>
+                            <div class="flex-col" style="flex:2;">
+                                <textarea id="reason-input" rows="2" placeholder="Enter content..." style="height:60px;min-height:60px;max-height:60px;resize:none;"></textarea>
+                            </div>
+                        </div>
+                        <button id="btn-reason" style="margin-top:4px;">🧠 Analogical Reasoning</button>
+                        <div id="reason-result" class="status info" style="white-space:pre-wrap;margin-top:8px;"></div>
+                        <div id="reason-detail" style="margin-top:6px;font-size:0.82rem;"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- end three-columns -->
+
+        <footer>Core: LangGraph + Neo4j + DeepSeek + Qwen | Multimodal Knowledge Fusion for Crane Life Assessment</footer>
+    </div>
+
+    <script>
+        // ==================== Global variables ====================
+        let textCsv = null, imageCsv = null, fusedCsv = null, rainflowExcel = null, graphToken = null;
+        let excelPath = null;
+        let nlNetwork = null;
+        let excelRowCount = 0;
+        let imageCount = 0;
+        let isConsistent = false;
+
+        // ==================== Chat message management ====================
+        const chatMessages = document.getElementById('chat-messages');
+        function scrollChatToBottom() {
+            const container = document.querySelector('.col-right .card:first-child .card-scroll');
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        function addChatMessage(type, content) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ' + type;
+            if (type === 'assistant' || type === 'error' || type === 'warning') {
+                msgDiv.textContent = '🤖 ' + content;
+            } else {
+                msgDiv.textContent = content;
+            }
+            chatMessages.appendChild(msgDiv);
+            setTimeout(scrollChatToBottom, 50);
+        }
+
+        // ==================== Helper functions ====================
+        function translateValidationError(text) {
+            if (text === null || text === undefined) return '';
+            let s = String(text);
+            const replacements = [
+                ['无相似案例', 'No similar cases retrieved'],
+                ['方向应为', ' expected direction '],
+                ['实际', ', got '],
+                ['证据不足', 'insufficient evidence'],
+                ['无正相关趋势', 'no positive trend in comparable cases'],
+                ['无负相关趋势', 'no negative trend in comparable cases'],
+                ['反事实测试失败：增大载荷后寿命反而增加', 'Counterfactual test failed: remaining life increased after the load was increased'],
+                ['反事实测试失败：减小载荷后寿命反而减少', 'Counterfactual test failed: remaining life decreased after the load was reduced'],
+                ['反事实测试异常:', 'Counterfactual test exception:'],
+                ['载荷水平', 'Load level'],
+                ['下的生成损伤值', ' generated damage'],
+                ['远小于参考损伤', ' is far below reference damage'],
+                ['违反载荷-损伤正比规则', 'violating the load-damage proportionality rule']
+            ];
+            replacements.forEach(([a, b]) => { s = s.split(a).join(b); });
+            return s;
+        }
+
+        function showStatus(elId, msg, type) {
+            const el = document.getElementById(elId);
+            if (!el) return;
+            if (type === 'success' && (elId === 'rainflow-status' || elId === 'damage-status' || elId === 'reason-result')) {
+                msg = '🤖 ' + msg;
+            }
+            el.innerHTML = msg;
+            el.className = 'status ' + type;
+        }
+
+        async function uploadFile(file, url, fieldName) {
+            fieldName = fieldName || 'excel';
+            const fd = new FormData();
+            fd.append(fieldName, file);
+            const res = await fetch(url, { method: 'POST', body: fd });
+            return await res.json();
+        }
+
+        // ==================== Data consistency check ====================
+        function checkConsistency() {
+            const consistencyEl = document.getElementById('consistency-status');
+            if (excelRowCount === 0 && imageCount === 0) {
+                consistencyEl.style.display = 'none';
+                return;
+            }
+            if (excelRowCount === 0) {
+                consistencyEl.style.display = 'block';
+                consistencyEl.className = 'status info';
+                consistencyEl.innerHTML = '📌 No Excel selected. Upload raw operational data for full mode.';
+                isConsistent = false;
+                return;
+            }
+            if (imageCount === 0) {
+                consistencyEl.style.display = 'block';
+                consistencyEl.className = 'status info';
+                consistencyEl.innerHTML = '📌 No stress contour images selected. Upload the corresponding images for full mode.';
+                isConsistent = false;
+                return;
+            }
+            if (excelRowCount === imageCount) {
+                consistencyEl.style.display = 'block';
+                consistencyEl.className = 'status consistency-pass';
+                consistencyEl.innerHTML = `✅ Excel: ${excelRowCount} rows; stress contour images: ${imageCount}. Counts match; you can continue.`;
+                isConsistent = true;
+            } else {
+                consistencyEl.style.display = 'block';
+                consistencyEl.className = 'status consistency-fail';
+                consistencyEl.innerHTML = `❌ Excel: ${excelRowCount} rows; stress contour images: ${imageCount}. Counts do not match; please check.`;
+                isConsistent = false;
+            }
+        }
+
+        // ==================== File selection events ====================
+        document.getElementById('excel-file').onchange = function(e) {
+            const file = e.target.files[0];
+            if (!file) {
+                excelRowCount = 0;
+                showStatus('excel-status', '', '');
+                checkConsistency();
+                return;
+            }
+            showStatus('excel-status', '⏳ Reading Excel row count...', 'info');
+            const reader = new FileReader();
+            reader.onload = function(loadEvent) {
+                try {
+                    const data = new Uint8Array(loadEvent.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                    excelRowCount = jsonData.length;
+                    graphToken = null;
+                    showStatus('excel-status', `✅ Selected: ${file.name} (${excelRowCount} rows)`, 'info');
+                } catch (err) {
+                    excelRowCount = 0;
+                    showStatus('excel-status', '❌ Failed to read Excel: ' + err.message, 'error');
+                }
+                checkConsistency();
+            };
+            reader.onerror = function() {
+                excelRowCount = 0;
+                showStatus('excel-status', '❌ Failed to read file', 'error');
+                checkConsistency();
+            };
+            reader.readAsArrayBuffer(file);
+        };
+
+        document.getElementById('image-files').onchange = function(e) {
+            const files = e.target.files;
+            const validFiles = Array.from(files).filter(f => f.name);
+            imageCount = validFiles.length;
+            graphToken = null;
+            if (imageCount > 0) {
+                showStatus('images-status', `🖼️ Selected ${imageCount} stress contour images`, 'info');
+            } else {
+                imageCount = 0;
+                showStatus('images-status', '', '');
+            }
+            checkConsistency();
+        };
+
+        document.getElementById('fused-file').onchange = function(e) {
+            if (e.target.files[0]) {
+                showStatus('fused-status', `📁 Fused CSV: ${e.target.files[0].name} is ready`, 'info');
+            } else {
+                showStatus('fused-status', '', '');
+            }
+        };
+
+        // ==================== Click upload areas to trigger file picker ====================
+
+        // ==================== Button events ====================
+
+        document.getElementById('btn-text-extract').onclick = async function() {
+            const file = document.getElementById('excel-file').files[0];
+            if (!file) { showStatus('text-status', 'Please upload the raw Excel file first', 'error'); return; }
+            graphToken = null;
+            showStatus('text-status', '⏳ Parsing Excel and extracting text knowledge triples...', 'info');
+            const data = await uploadFile(file, '/api/text_extract', 'excel');
+            if (data.success) {
+                textCsv = data.csv_path;
+                excelPath = data.excel_path;
+                showStatus('text-status', '✅ Text triple extraction completed. File: ' + textCsv, 'success');
+            } else {
+                showStatus('text-status', '❌ Extraction failed: ' + data.error, 'error');
+            }
+        };
+
+        document.getElementById('btn-image-extract').onclick = async function() {
+            const files = document.getElementById('image-files').files;
+            if (!files.length) { showStatus('image-status', 'Please upload stress contour images first', 'error'); return; }
+            graphToken = null;
+            showStatus('image-status', '🖌️ Analyzing stress contour images with the vision model...', 'info');
+            const fd = new FormData();
+            for (let f of files) fd.append('images', f);
+            const res = await fetch('/api/image_extract', { method: 'POST', body: fd });
+            const data = await res.json();
+            if (data.success) {
+                imageCsv = data.csv_path;
+                const st = data.extraction_summary || {};
+                let auditText = '';
+                if (st.images_received !== undefined) {
+                    auditText = `<br>Processed ${st.images_successful}/${st.images_received} images; ` +
+                                `Producer calls ${st.producer_requests}/${st.minimum_expected_producer_requests}；` +
+                                `Verifier calls ${st.verifier_requests}; elapsed ${st.elapsed_seconds}s.`;
+                }
+                showStatus('image-status', '✅ Image triple extraction completed: ' + imageCsv + auditText, 'success');
+            } else {
+                showStatus('image-status', '❌ Extraction failed: ' + data.error, 'error');
+            }
+        };
+
+        document.getElementById('btn-fusion').onclick = async function() {
+            if (!textCsv || !imageCsv) {
+                showStatus('fusion-status', 'Text or image triples are missing. Complete knowledge extraction for both modalities first.', 'error');
+                return;
+            }
+            graphToken = null;
+            showStatus('fusion-status', '🔄 Running entity alignment, conflict resolution, and cross-modal fusion...', 'info');
+            try {
+                const res = await fetch('/api/fusion', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text_csv: textCsv, image_csv: imageCsv })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    fusedCsv = data.fused_csv;
+                    showStatus('fusion-status', '✅ Cross-modal fusion completed. Fused triples: ' + fusedCsv, 'success');
+                } else {
+                    showStatus('fusion-status', '❌ Fusion failed: ' + (data.error || 'unknown error'), 'error');
+                }
+            } catch (err) {
+                showStatus('fusion-status', '❌ Fusion request failed: ' + err.message + '. Check the backend [Fusion] log.', 'error');
+            }
+        };
+
+        document.getElementById('btn-kg-import').onclick = async function() {
+            const fusedFileInput = document.getElementById('fused-file');
+            if (fusedFileInput.files.length > 0) {
+                const fd = new FormData();
+                fd.append('fused_file', fusedFileInput.files[0]);
+                showStatus('kg-status', '⏫ Uploading fused CSV and importing into Neo4j...', 'info');
+                const res = await fetch('/api/kg_import', { method: 'POST', body: fd });
+                const data = await res.json();
+                if (data.success) {
+                    graphToken = data.graph_token || null;
+                    let msg = data.message;
+                    if (data.damage_updated) {
+                        msg += '; ' + data.damage_message;
+                    } else {
+                        msg += '; ' + data.damage_message;
+                    }
+                    showStatus('kg-status', '✅ ' + msg, 'success');
+                } else {
+                    showStatus('kg-status', '❌ Import failed: ' + data.error, 'error');
+                }
+                return;
+            } else if (fusedCsv) {
+                showStatus('kg-status', '📤 Importing the current fused result into Neo4j...', 'info');
+                const payload = { fused_csv: fusedCsv };
+                if (excelPath) {
+                    payload.excel_path = excelPath;
+                }
+                const res = await fetch('/api/kg_import', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    graphToken = data.graph_token || null;
+                    let msg = data.message;
+                    if (data.damage_updated) {
+                        msg += '; ' + data.damage_message;
+                    } else {
+                        msg += '; ' + data.damage_message;
+                    }
+                    showStatus('kg-status', '✅ ' + msg, 'success');
+                } else {
+                    showStatus('kg-status', '❌ ' + data.error, 'error');
+                }
+                return;
+            } else {
+                showStatus('kg-status', 'Complete cross-modal fusion first, or upload an existing fused-triple CSV', 'error');
+            }
+        };
+
+        document.getElementById('btn-rainflow').onclick = async function() {
+            const file = document.getElementById('excel-file').files[0];
+            if (!file) { showStatus('rainflow-status', 'Please upload the raw operational-data Excel first', 'error'); return; }
+            showStatus('rainflow-status', '🌊 Running rainflow counting...', 'info');
+            const data = await uploadFile(file, '/api/rainflow', 'excel');
+            if (data.success) {
+                rainflowExcel = data.rainflow_excel;
+                showStatus('rainflow-status', '✅ Rainflow counting completed and the result file was generated.', 'success');
+            } else {
+                showStatus('rainflow-status', '❌ Rainflow counting failed: ' + data.error, 'error');
+            }
+        };
+
+        document.getElementById('btn-damage').onclick = async function() {
+            if (!rainflowExcel) { showStatus('damage-status', 'Please run rainflow counting first', 'error'); return; }
+            if (!graphToken) {
+                showStatus('damage-status', 'Complete triple extraction and fusion, then import the current fused result into Neo4j before fatigue calculation.', 'error');
+                return;
+            }
+            showStatus('damage-status', '📐 Calculating cumulative damage via Miner’s rule and stress data from the current TC-MMKG...', 'info');
+            const res = await fetch('/api/damage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rainflow_excel: rainflowExcel, graph_token: graphToken })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showStatus('damage-status', '✅ Life prediction completed', 'success');
+                let report = (data.report || 'Cumulative damage and remaining-life results are shown below.').replace(/\n/g, '<br>');
+                let html = '<div class="success" style="padding:10px;">🤖 ' + report + '</div>';
+                if (data.chart_url) html += '<img src="' + data.chart_url + '" class="result-img" alt="Life curve">';
+                document.getElementById('damage-result').innerHTML = html;
+                if (data.report_url) {
+                    const link = document.createElement('a');
+                    link.href = data.report_url;
+                    link.download = 'Truck-Crane-Boom-Remaining-Fatigue-Life-Assessment-Report.docx';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    const notice = document.createElement('div');
+                    notice.className = 'status success';
+                    notice.style.marginTop = '8px';
+                    notice.innerHTML = '📄 The assessment report has been downloaded automatically.';
+                    document.getElementById('damage-result').appendChild(notice);
+                }
+            } else {
+                showStatus('damage-status', '❌ Damage calculation failed: ' + data.error, 'error');
+            }
+        };
+
+        // Smart Assistant events
+        document.getElementById('btn-query').onclick = async function() {
+            const input = document.getElementById('kg-question');
+            const q = input.value.trim();
+            if (!q) { addChatMessage('error', 'Please enter a question'); return; }
+            addChatMessage('user', q);
+            input.value = '';
+            addChatMessage('assistant', '⏳ Searching knowledge graph...');
+            try {
+                const res = await fetch('/api/kg_query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: q })
+                });
+                const data = await res.json();
+                chatMessages.removeChild(chatMessages.lastChild);
+                if (data.success) {
+                    addChatMessage('assistant', '📌 ' + data.answer);
+                } else {
+                    addChatMessage('error', '❌ Query failed: ' + data.error);
+                }
+            } catch (err) {
+                chatMessages.removeChild(chatMessages.lastChild);
+                addChatMessage('error', 'Request error: ' + err.message);
+            }
+        };
+
+        document.getElementById('btn-nl-visualize').onclick = async function() {
+            const input = document.getElementById('nl-question');
+            const question = input.value.trim();
+            if (!question) { addChatMessage('error', 'Please enter a natural language question'); return; }
+            addChatMessage('user', question);
+            input.value = '';
+            addChatMessage('assistant', '⏳ Generating Cypher and querying graph...');
+            try {
+                const res = await fetch('/api/kg_nl_query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: question })
+                });
+                const data = await res.json();
+                chatMessages.removeChild(chatMessages.lastChild);
+
+                const visContainer = document.getElementById('nl-vis-container');
+                const cypherDisplay = document.getElementById('nl-cypher-display');
+
+                if (data.success && data.nodes && data.nodes.length > 0) {
+                    visContainer.style.display = 'block';
+                    cypherDisplay.innerHTML = '<strong>📜 Generated Cypher:</strong> ' + (data.cypher || 'semantic parse');
+                    const nodes = data.nodes.map(function(node) {
+                        return { id: node.id, label: node.label || node.name || node.id, title: node.title || (node.label || 'Entity') + ' details', group: node.group || 'main' };
+                    });
+                    const edges = data.edges.map(function(edge) {
+                        return { from: edge.from, to: edge.to, label: edge.label || edge.relation, title: edge.label || edge.relation, arrows: 'to' };
+                    });
+                    const container = document.getElementById('nl-vis-network');
+                    const networkData = {
+                        nodes: new vis.DataSet(nodes),
+                        edges: new vis.DataSet(edges)
+                    };
+                    const options = {
+                        nodes: {
+                            shape: 'dot',
+                            size: 30,
+                            font: { size: 15, face: 'Segoe UI', color: '#1a2f3f', strokeWidth: 0.5, background: '#ffffff' },
+                            borderWidth: 2,
+                            color: { background: '#cbe5fe', border: '#2c7cb6', highlight: { background: '#ffefb9', border: '#e69500' } },
+                            shadow: true
+                        },
+                        edges: {
+                            arrows: { to: { enabled: true, scaleFactor: 0.9 } },
+                            font: { size: 13, align: 'middle', background: '#ffffff', strokeWidth: 0, color: '#1e5575' },
+                            smooth: { type: 'curvedCW', roundness: 0.2 },
+                            color: { color: '#6987a3', hover: '#1f6ea0' },
+                            width: 2
+                        },
+                        physics: {
+                            stabilization: { iterations: 120 },
+                            barnesHut: { gravitationalConstant: -40000, centralGravity: 0.25, springLength: 100 }
+                        },
+                        interaction: { hover: true, tooltipDelay: 100, navigationButtons: true },
+                        layout: { improvedLayout: true }
+                    };
+                    if (nlNetwork) nlNetwork.destroy();
+                    nlNetwork = new vis.Network(container, networkData, options);
+                    nlNetwork.fit({ animation: true });
+                    addChatMessage('assistant', '✅ Graph visualization ready | Nodes: ' + nodes.length + ' | Edges: ' + edges.length);
+                } else if (data.success && (!data.nodes || data.nodes.length === 0)) {
+                    visContainer.style.display = 'none';
+                    addChatMessage('warning', '⚠️ Query returned empty result. Try different keywords or check graph data.');
+                    cypherDisplay.innerHTML = '<strong>Generated Cypher:</strong> ' + (data.cypher || 'none');
+                } else {
+                    visContainer.style.display = 'none';
+                    addChatMessage('error', '❌ Query failed: ' + (data.error || 'no response'));
+                }
+            } catch (err) {
+                chatMessages.removeChild(chatMessages.lastChild);
+                addChatMessage('error', 'Request error: ' + err.message);
+            }
+        };
+
+        // Analogical Reasoning
+        document.getElementById('btn-reason').onclick = async function() {
+            const modal = document.getElementById('reason-modal').value;
+            const content = document.getElementById('reason-input').value.trim();
+            if (!content) { showStatus('reason-result', 'Please enter content', 'error'); return; }
+            showStatus('reason-result', '⏳ Retrieving cases and running analogical reasoning with causal validation...', 'info');
+            try {
+                const res = await fetch('/api/crossmodal_reason', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ modal: modal, content: content })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    let html = '<div class="success">✅ Validation passed<br><strong>Generated result:</strong><br>🤖 ' + data.generated_text + '</div>';
+                    if (data.reasoning_chain && data.reasoning_chain.length) {
+                        html += '<div class="info" style="margin-top:10px;"><strong>Reasoning chain:</strong><br>' + data.reasoning_chain.join('<br>') + '</div>';
+                    }
+                    if (data.retrieved_cases && data.retrieved_cases.length) {
+                        html += '<div class="info"><strong>Retrieved cases (top ' + data.retrieved_cases.length + '):</strong><br>';
+                        for (var i = 0; i < data.retrieved_cases.length; i++) {
+                            var c = data.retrieved_cases[i];
+                            html += '<div style="margin-top:6px;border-left:2px solid #2c7cb6;padding-left:10px;font-size:0.85rem;">' +
+                                'Time: ' + c.time + ' | Similarity: ' + c.similarity.toFixed(3) + '<br>' +
+                                'Text: ' + c.text_desc.substring(0, 80) + '...<br>' +
+                                'Stress: ' + c.stress_desc.substring(0, 80) + '...<br>' +
+                                'Life: ' + c.life_value.toExponential(2) +
+                                '</div>';
+                        }
+                        html += '</div>';
+                    }
+                    document.getElementById('reason-result').innerHTML = html;
+                    document.getElementById('reason-result').className = 'status success';
+                } else {
+                    var errors = Array.isArray(data.validation_errors) ? data.validation_errors : [data.validation_errors || 'unknown error'];
+                    errors = errors.map(translateValidationError);
+                    var html = '<div class="error">❌ Validation failed (layer: ' + (data.validation_layer || 'unknown') +
+                        ')<br>Errors: ' + errors.join('<br>') + '</div>';
+                    if (data.generated_text) {
+                        html += '<div class="warning">Raw generation: ' + data.generated_text + '</div>';
+                    }
+                    document.getElementById('reason-result').innerHTML = html;
+                    document.getElementById('reason-result').className = 'status error';
+                }
+            } catch (err) {
+                console.error(err);
+                showStatus('reason-result', 'Request error: ' + err.message, 'error');
+            }
+        };
+
+        // ========== Keyboard shortcuts ==========
+        document.getElementById('kg-question').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') document.getElementById('btn-query').click();
+        });
+        document.getElementById('nl-question').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') document.getElementById('btn-nl-visualize').click();
+        });
+
+        // ========== Welcome message ==========
+        window.addEventListener('DOMContentLoaded', function() {
+            addChatMessage('assistant', '👋 Hello! I am the crane life-assessment assistant. You can ask me questions about the knowledge graph.');
+        });
+
+        // ==================== Export functions (unchanged logic) ====================
+        function downloadWord(content, filename) {
+            const blob = new Blob([content], { type: 'application/msword;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+
+        function exportChatToWord() {
+            const messages = document.querySelectorAll('#chat-messages .message');
+            let html = `<html><head><meta charset="UTF-8"><title>Smart Assistant Chat Record</title>
+            <style>body{font-family:SimHei,sans-serif;padding:20px;}h2{color:#0a3a5e;}p{margin:8px 0;}.user{color:#08526e;}.assistant{color:#0a4c2a;}</style>
+            </head><body><h2>🤖 Smart Assistant Chat Record</h2>`;
+            if (messages.length === 0) {
+                html += '<p>No chat records yet.</p>';
+            } else {
+                messages.forEach(msg => {
+                    const text = msg.textContent;
+                    const role = msg.classList.contains('user') ? 'User' : 'Assistant';
+                    html += `<p><strong>${role}: </strong>${text}</p>`;
+                });
+            }
+            html += '</body></html>';
+            downloadWord(html, 'Smart_Assistant_Chat_Record.doc');
+        }
+
+        function exportReasonToWord() {
+            const resultDiv = document.getElementById('reason-result');
+            const detailDiv = document.getElementById('reason-detail');
+            let html = `<html><head><meta charset="UTF-8"><title>Analogical Reasoning Results</title>
+            <style>body{font-family:SimHei,sans-serif;padding:20px;}h2{color:#0a3a5e;}.result-box{margin:10px 0;padding:10px;border-left:4px solid #2c7cb6;background:#f7fafc;}</style>
+            </head><body><h2>🧠 Analogical Reasoning Results</h2>`;
+            if (resultDiv) {
+                html += `<div class="result-box">${resultDiv.innerHTML}</div>`;
+            }
+            if (detailDiv && detailDiv.innerHTML.trim()) {
+                html += `<hr><h3>📌 Details</h3><div>${detailDiv.innerHTML}</div>`;
+            }
+            if (!resultDiv || !resultDiv.innerHTML.trim()) {
+                html += '<p>No reasoning result yet.</p>';
+            }
+            html += '</body></html>';
+            downloadWord(html, 'Analogical_Reasoning_Results.doc');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatBtn = document.getElementById('export-chat-btn');
+            if (chatBtn) chatBtn.addEventListener('click', exportChatToWord);
+            const reasonBtn = document.getElementById('export-reason-btn');
+            if (reasonBtn) reasonBtn.addEventListener('click', exportReasonToWord);
+        });
+    </script>
+</body>
+</html>

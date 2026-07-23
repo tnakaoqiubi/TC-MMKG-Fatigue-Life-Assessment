@@ -1,0 +1,14 @@
+Strict rollback scope:
+- 🧠 Cross-modal analogical reasoning and causal validation
+- 💬 Smart assistant (KG QA + natural-language graph visualization)
+
+Core algorithm/flow restored from the initially uploaded files:
+- scripts/analogical_reasoner.py (original logic; API configuration sourced from config.py)
+- scripts/case_library.py (original logic; Neo4j/SBERT configuration sourced from config.py)
+- scripts/causal_validator.py (original validation logic)
+- scripts/causal_rules.py (original causal rules)
+- scripts/qa_1.py (original QA prompt/chain; credentials sourced from config.py)
+- app.py (related endpoints retain the restored call flow)
+- templates/index3.html (related front-end flow retained; user-facing text localized)
+
+Not rolled back: current revised text/image extraction, fusion, Neo4j ingestion, rainflow/damage, and LangGraph methods.

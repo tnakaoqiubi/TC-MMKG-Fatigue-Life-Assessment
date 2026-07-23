@@ -1,0 +1,3 @@
+Language version: English (en)
+Algorithm baseline: corresponds to TC_MMKG_Code_Revised_CN_FINAL
+Note: user-visible text is localized; core algorithms, APIs, and data structures are unchanged.
